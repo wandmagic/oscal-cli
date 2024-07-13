@@ -118,6 +118,9 @@
 		<dependency.saxon-he.version>12.4</dependency.saxon-he.version>
 		<dependency.xmlresolver.version>5.2.2</dependency.xmlresolver.version>
 
+		<!-- j2cl settings -->
+		<j2cl.version>0.10.0-3c97afeac</j2cl.version>
+		<j2cl.maven.plugin.version>0.22.0</j2cl.maven.plugin.version>
 		<plugin.license.version>4.2</plugin.license.version>
 	</properties>
 	<repositories>
@@ -240,6 +243,21 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-params</artifactId>
 			<scope>test</scope>
+		</dependency>
+		 <dependency>
+			<groupId>com.vertispan.j2cl</groupId>
+			<artifactId>junit-annotations</artifactId>
+			<version>${j2cl.version}</version>
+    	</dependency>
+		<dependency>
+			<groupId>com.vertispan.j2cl</groupId>
+			<artifactId>gwttestcase-emul</artifactId>
+			<version>${j2cl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vertispan.j2cl</groupId>
+			<artifactId>junit-emul</artifactId>
+			<version>${j2cl.version}</version>
 		</dependency>		
 	</dependencies>
 	<build>
@@ -284,6 +302,24 @@
 					<artifactId>spotbugs-maven-plugin</artifactId>
 					<configuration>
 						<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.vertispan.j2cl</groupId>
+					<artifactId>j2cl-maven-plugin</artifactId>
+					<version>${j2cl.maven.plugin.version}</version>
+					<executions>
+						<execution>
+							<id>build-js</id>
+							<phase>process-classes</phase>
+							<goals>
+								<goal>build</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<webappDirectory>${project.build.directory}/j2cl-output</webappDirectory>
+						<compilationLevel>ADVANCED</compilationLevel>
 					</configuration>
 				</plugin>
 			</plugins>
