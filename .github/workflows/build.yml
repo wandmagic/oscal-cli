@@ -72,6 +72,24 @@ jobs:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    # New step to produce and publish JavaScript artifacts
+    - name: Build and Publish JavaScript Artifacts
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release-'))
+      run: |
+        # Ensure J2CL plugin is configured in your pom.xml
+        mvn -B -e -Prelease com.vertispan.j2cl:j2cl-maven-plugin:build
+        
+        # Create a ZIP file of the J2CL output
+        cd target/j2cl-output
+        zip -r ../../oscal-cli-js-artifacts.zip .
+        cd ../..
+        
+        # Create a GitHub release
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        gh release create v$VERSION oscal-cli-js-artifacts.zip --title "Release $VERSION" --notes "JavaScript artifacts for OSCAL CLI version $VERSION"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Perform CodeQL Analysis
       if: github.event_name == 'push'
       uses: github/codeql-action/analyze@b7bf0a3ed3ecfa44160715d7c442788f65f0f923
